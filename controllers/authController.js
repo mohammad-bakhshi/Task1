@@ -1,4 +1,7 @@
+const createError = require('http-errors');
 const User = require('../models/user');
+const { signAccessToken, signRefreshToken,
+    verifyRefreshToken } = require('../middlewares/authorization');
 
 //create a new user
 const create_user = async (req, res, next) => {
@@ -7,7 +10,9 @@ const create_user = async (req, res, next) => {
         if (!user) {
             const { fullname, cellphone, password } = req.body;
             const newUser = await User.create({ fullname, cellphone, password });
-            return res.status(201).json({ status: 'User created successfully.', data: newUser });
+            const accessToken = await signAccessToken(newUser._id.toString());
+            const refreshToken = await signRefreshToken(newUser._id.toString());
+            return res.status(201).json({ status: 'User created successfully.', accessToken, refreshToken });
         } else {
             return res.status(422).json({ message: "User already exists." });
         }
@@ -26,7 +31,9 @@ const login_user = async (req, res, next) => {
         }
         else {
             if (password === user.password) {
-                return res.status(200).json({ status: 'logged in successfully', data: user });
+                const accessToken = await signAccessToken(user._id.toString());
+                const refreshToken = await signRefreshToken(user._id.toString());
+                return res.status(200).json({ status: 'logged in successfully', accessToken, refreshToken });
             }
             return res.status(401).json({ message: "Password was not correct." });
         }
@@ -35,7 +42,37 @@ const login_user = async (req, res, next) => {
     }
 }
 
+const refreshToken = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.body
+        if (!refreshToken) throw createError.BadRequest()
+        const userId = await verifyRefreshToken(refreshToken)
+
+        const accessToken = await signAccessToken(userId)
+        const refToken = await signRefreshToken(userId)
+        res.send({ accessToken: accessToken, refreshToken: refToken })
+    } catch (error) {
+        next(error)
+    }
+}
+
+const logout = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.body
+        if (!refreshToken) throw createError.BadRequest()
+        const userId = await verifyRefreshToken(refreshToken)
+        client.DEL(userId, (err, val) => {
+            if (err) {
+                console.log(err.message)
+                throw createError.InternalServerError()
+            }
+            console.log(val)
+            res.sendStatus(204)
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 
 
-
-module.exports = { create_user, login_user };
+module.exports = { create_user, login_user, refreshToken, logout };

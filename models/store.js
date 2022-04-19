@@ -23,7 +23,7 @@ const StoreSchema = new Schema({
     user: {
         ref: "user",
         type: Schema.Types.ObjectId,
-        // required: true
+        required: true
     }
 }, { timestamps: true });
 const Store = mongoose.model("store", StoreSchema);

@@ -98,4 +98,9 @@ router.post('/register', userValidation.createValidator, userController.create_u
 router.post('/login', userValidation.loginValidator, userController.login_user);
 
 
+router.post('/refresh-token', userController.refreshToken);
+
+router.delete('/logout', userController.logout);
+
+
 module.exports = router;

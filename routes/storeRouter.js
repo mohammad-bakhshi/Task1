@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const storeController = require('../controllers/storeController');
-// const { authenticateToken } = require('../middlewares/authorization');
+const { verifyAccessToken } = require('../middlewares/authorization');
 
-// router.use(authenticateToken);
+router.use(verifyAccessToken);
 
 /**
  * @swagger

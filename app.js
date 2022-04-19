@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const cors = require('cors');
+const createError = require('http-errors');
 
 
 const appRouter = require('./routes/appRouter');
@@ -60,11 +61,16 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 // goes to app route
 app.use('/api', appRouter);
 
+//404 error
+app.use((req, res, next) => {
+	next(createError.NotFound());
+})
+
 
 //error handler
 app.use(function (err, req, res, next) {
 	console.log(err);
-	return res.status(err.statusCode).json({ err: err.message });
+	return res.status(err.status || 500).json({ err: err.message });
 });
 
 module.exports = app;
