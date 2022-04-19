@@ -5,11 +5,11 @@ const StoreSchema = new Schema({
     name: {
         type: String,
         required: [true, "Store name is required."],
+        unique: true,
         trim: true
     },
     address: {
         type: String,
-        required: [true, "Address is required."],
         trim: true
     },
     image: {
@@ -23,7 +23,7 @@ const StoreSchema = new Schema({
     user: {
         ref: "user",
         type: Schema.Types.ObjectId,
-        required: true
+        // required: true
     }
 }, { timestamps: true });
 const Store = mongoose.model("store", StoreSchema);
