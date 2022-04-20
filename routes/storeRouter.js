@@ -31,9 +31,9 @@ router.use(verifyAccessToken);
  *           type: string
  *           description: The Store location
  *       example:
- *         name: "Google"
+ *         name: "Apple"
  *         address: "America,California"
- *         image: "google.png"
+ *         image: "apple.png"
  *         location: "America"
  *   responses:
  *    UnauthorizedError:
@@ -51,9 +51,9 @@ router.use(verifyAccessToken);
  * @swagger
  * /api/store:
  *   post:
- *     summary: Create a new store
  *     security:
- *       -bearerAuth: []
+ *       - bearerAuth: []
+ *     summary: Create a new store
  *     tags: [Stores]
  *     requestBody:
  *       required: true
