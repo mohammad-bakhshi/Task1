@@ -35,6 +35,9 @@ router.use(verifyAccessToken);
  *         address: "America,California"
  *         image: "google.png"
  *         location: "America"
+ *   responses:
+ *    UnauthorizedError:
+ *      description: Access token is missing or invalid
  */
 
 /**
@@ -49,6 +52,8 @@ router.use(verifyAccessToken);
  * /api/store:
  *   post:
  *     summary: Create a new store
+ *     security:
+ *       -bearerAuth: []
  *     tags: [Stores]
  *     requestBody:
  *       required: true
@@ -79,6 +84,8 @@ router.post('/', storeController.create_store);
  * @swagger
  * /api/store/{storeID}:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get a store by ID
  *     parameters:
  *      - in: path
@@ -91,6 +98,8 @@ router.post('/', storeController.create_store);
  *           application/json:
  *             schema:
  *                 $ref: '#/components/schemas/Store'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       422:
  *         description: Store not found
  */

@@ -1,7 +1,6 @@
 const createError = require('http-errors');
 const User = require('../models/user');
-const { signAccessToken, signRefreshToken,
-    verifyRefreshToken } = require('../middlewares/authorization');
+const { signAccessToken, signRefreshToken, verifyRefreshToken, redisClient } = require('../utils/jwt_helper');
 
 //create a new user
 const create_user = async (req, res, next) => {
@@ -42,32 +41,34 @@ const login_user = async (req, res, next) => {
     }
 }
 
-const refreshToken = async (req, res, next) => {
+//refresh token
+const refresh_token = async (req, res, next) => {
     try {
-        const { refreshToken } = req.body
-        if (!refreshToken) throw createError.BadRequest()
-        const userId = await verifyRefreshToken(refreshToken)
+        const { refreshToken } = req.body;
+        if (!refreshToken) throw createError.BadRequest();
+        const userId = await verifyRefreshToken(refreshToken);
 
-        const accessToken = await signAccessToken(userId)
-        const refToken = await signRefreshToken(userId)
-        res.send({ accessToken: accessToken, refreshToken: refToken })
+        const accessToken = await signAccessToken(userId);
+        const refToken = await signRefreshToken(userId);
+        return res.status(200).json({ accessToken, refreshToken: refToken });
     } catch (error) {
-        next(error)
+        next(error);
     }
 }
 
+//logout
 const logout = async (req, res, next) => {
     try {
-        const { refreshToken } = req.body
+        const { refreshToken } = req.body;
         if (!refreshToken) throw createError.BadRequest()
         const userId = await verifyRefreshToken(refreshToken)
-        client.DEL(userId, (err, val) => {
+        redisClient.DEL(userId, (err, val) => {
             if (err) {
                 console.log(err.message)
                 throw createError.InternalServerError()
             }
             console.log(val)
-            res.sendStatus(204)
+            return res.sendStatus(204)
         })
     } catch (error) {
         next(error)
@@ -75,4 +76,4 @@ const logout = async (req, res, next) => {
 }
 
 
-module.exports = { create_user, login_user, refreshToken, logout };
+module.exports = { create_user, login_user, refresh_token, logout };

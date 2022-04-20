@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const createError = require('http-errors');
 
 const userController = require('../controllers/authController');
+const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../middlewares/authorization');
 const userValidation = require('../middlewares/validation/userValidation');
 
 /**
@@ -98,9 +100,10 @@ router.post('/register', userValidation.createValidator, userController.create_u
 router.post('/login', userValidation.loginValidator, userController.login_user);
 
 
-router.post('/refresh-token', userController.refreshToken);
+router.post('/refresh-token', userController.refresh_token);
 
-router.delete('/logout', userController.logout);
+router.delete('/logout', userController.logout)
+
 
 
 module.exports = router;
